@@ -86,7 +86,9 @@ class JxlsStreamingIntegrationTest {
         }
         """;
     Schema schema = new Schema.Parser().parse(schemaJson);
+    var conf = com.example.jxlsstream.parquet.HadoopConfigurationFactory.create();
     try (ParquetWriter<GenericRecord> writer = AvroParquetWriter.<GenericRecord>builder(new org.apache.hadoop.fs.Path(file))
+        .withConf(conf)
         .withSchema(schema)
         .withCompressionCodec(CompressionCodecName.SNAPPY)
         .withPageSize(128 * 1024)
