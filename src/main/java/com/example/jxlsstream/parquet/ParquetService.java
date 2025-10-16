@@ -28,13 +28,13 @@ public class ParquetService {
         .build();
 
     return new Iterator<>() {
-      GenericRecord next;
+      GenericRecord nextRecord;
       boolean fetched = false;
 
       private void fetch() {
         if (fetched) return;
         try {
-          next = reader.read();
+          nextRecord = reader.read();
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -43,15 +43,17 @@ public class ParquetService {
 
       @Override public boolean hasNext() {
         fetch();
-        if (next == null) {
+        if (nextRecord == null) {
           try { reader.close(); } catch (IOException ignored) {}
         }
-        return next != null;
+        return nextRecord != null;
       }
 
       @Override public TransactionRecord next() {
         if (!hasNext()) throw new NoSuchElementException();
-        GenericRecord rec = next; fetched = false; next = null;
+        GenericRecord rec = nextRecord;
+        fetched = false;
+        nextRecord = null;
         return map(rec);
       }
 
