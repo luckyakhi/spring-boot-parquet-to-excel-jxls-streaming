@@ -6,7 +6,7 @@ import org.jxls.transform.Transformer;
 import org.jxls.util.JxlsHelper;
 import org.jxls.transform.poi.PoiTransformer;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -21,7 +21,7 @@ public class JxlsStreamingExporter {
                      Iterator<TransactionRecord> rows,
                      int windowSize) throws Exception {
 
-    Workbook templateWorkbook = WorkbookFactory.create(templateXlsx);
+    Workbook templateWorkbook = new XSSFWorkbook(templateXlsx);
 
     Transformer transformer = PoiTransformer.createSxssfTransformer(templateWorkbook, out, windowSize, true);
 
