@@ -40,7 +40,10 @@ class JxlsStreamingIntegrationTest {
   @Test
   void jxls_streaming_over_50k_rows_succeeds() throws Exception {
     Path parquet = tmp.resolve("transactions.parquet");
-    Path xlsx = tmp.resolve("transactions.xlsx");
+    Path outputDir = Path.of("target", "test-output");
+    Files.createDirectories(outputDir);
+    Path xlsx = outputDir.resolve("transactions.xlsx");
+    Files.deleteIfExists(xlsx);
 
     // 1) Create a Parquet with ~50k rows (increase to 200k locally if needed)
     writeSampleParquet(parquet.toString(), 50_00000);
