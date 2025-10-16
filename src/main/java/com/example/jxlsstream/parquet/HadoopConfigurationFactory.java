@@ -10,14 +10,14 @@ import org.apache.hadoop.fs.LocalFileSystem;
  * full Hadoop setup while still allowing real Hadoop configurations to take
  * effect when present.
  */
-final class HadoopConfigurationFactory {
+public final class HadoopConfigurationFactory {
 
   private static final String HADOOP_HOME = System.getenv("HADOOP_HOME");
 
   private HadoopConfigurationFactory() {
   }
 
-  static Configuration create() {
+  public static Configuration create() {
     Configuration conf = new Configuration();
 
     if (HADOOP_HOME == null || HADOOP_HOME.isBlank()) {

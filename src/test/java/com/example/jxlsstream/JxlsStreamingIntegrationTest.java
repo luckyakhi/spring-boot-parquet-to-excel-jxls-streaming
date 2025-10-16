@@ -2,6 +2,7 @@ package com.example.jxlsstream;
 
 import com.example.jxlsstream.dto.TransactionRecord;
 import com.example.jxlsstream.excel.JxlsStreamingExporter;
+import com.example.jxlsstream.parquet.HadoopConfigurationFactory;
 import com.example.jxlsstream.parquet.ParquetService;
 import com.example.jxlsstream.template.TemplateBuilder;
 import org.apache.avro.Schema;
@@ -42,7 +43,7 @@ class JxlsStreamingIntegrationTest {
     Path xlsx = tmp.resolve("transactions.xlsx");
 
     // 1) Create a Parquet with ~50k rows (increase to 200k locally if needed)
-    writeSampleParquet(parquet.toString(), 50_000);
+    writeSampleParquet(parquet.toString(), 50_00000);
 
     // 2) Lazily read rows
     Iterator<TransactionRecord> it = parquetService.readAsIterator(parquet.toString());
@@ -86,7 +87,7 @@ class JxlsStreamingIntegrationTest {
         }
         """;
     Schema schema = new Schema.Parser().parse(schemaJson);
-    var conf = com.example.jxlsstream.parquet.HadoopConfigurationFactory.create();
+    var conf = HadoopConfigurationFactory.create();
     try (ParquetWriter<GenericRecord> writer = AvroParquetWriter.<GenericRecord>builder(new org.apache.hadoop.fs.Path(file))
         .withConf(conf)
         .withSchema(schema)
