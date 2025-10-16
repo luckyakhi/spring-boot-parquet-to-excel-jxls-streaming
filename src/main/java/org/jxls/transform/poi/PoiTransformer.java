@@ -181,6 +181,37 @@ public class PoiTransformer extends AbstractTransformer {
         return new PoiTransformer(workbook, true, rowAccessWindowSize, compressTmpFiles, useSharedStringsTable);
     }
 
+    /**
+     * Creates transformer for given workbook and streaming parameters. Streaming will be used.
+     * Output will be written to provided {@link OutputStream}.
+     *
+     * @param workbook Excel template. Format must be XLSX.
+     * @param outputStream destination for generated Excel content
+     * @param rowAccessWindowSize streaming window size
+     * @param compressTmpFiles whether temporary files should be compressed
+     * @return transformer instance with the given workbook as template
+     */
+    public static PoiTransformer createSxssfTransformer(Workbook workbook, OutputStream outputStream, int rowAccessWindowSize, boolean compressTmpFiles) {
+        return createSxssfTransformer(workbook, outputStream, rowAccessWindowSize, compressTmpFiles, false);
+    }
+
+    /**
+     * Creates transformer for given workbook and streaming parameters. Streaming will be used.
+     * Output will be written to provided {@link OutputStream}.
+     *
+     * @param workbook Excel template. Format must be XLSX.
+     * @param outputStream destination for generated Excel content
+     * @param rowAccessWindowSize streaming window size
+     * @param compressTmpFiles whether temporary files should be compressed
+     * @param useSharedStringsTable whether a shared strings table should be used
+     * @return transformer instance with the given workbook as template
+     */
+    public static PoiTransformer createSxssfTransformer(Workbook workbook, OutputStream outputStream, int rowAccessWindowSize, boolean compressTmpFiles, boolean useSharedStringsTable) {
+        PoiTransformer transformer = createSxssfTransformer(workbook, rowAccessWindowSize, compressTmpFiles, useSharedStringsTable);
+        transformer.setOutputStream(outputStream);
+        return transformer;
+    }
+
     public static Context createInitialContext() {
         Context context = new Context();
         context.putVar(POI_CONTEXT_KEY, new PoiUtil());
