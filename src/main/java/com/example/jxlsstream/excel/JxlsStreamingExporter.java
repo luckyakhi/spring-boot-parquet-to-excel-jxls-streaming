@@ -2,7 +2,6 @@ package com.example.jxlsstream.excel;
 
 import com.example.jxlsstream.dto.TransactionRecord;
 import org.jxls.common.Context;
-import org.jxls.transform.Transformer;
 import org.jxls.util.JxlsHelper;
 import org.jxls.transform.poi.PoiTransformer;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,31 +21,32 @@ public class JxlsStreamingExporter {
                      Iterator<TransactionRecord> rows,
                      int windowSize) throws Exception {
 
-    Workbook templateWorkbook = new XSSFWorkbook(templateXlsx);
+    try (Workbook templateWorkbook = new XSSFWorkbook(templateXlsx)) {
+      PoiTransformer transformer = PoiTransformer.createSxssfTransformer(templateWorkbook, out, windowSize, true);
 
-    Transformer transformer = PoiTransformer.createSxssfTransformer(templateWorkbook, out, windowSize, true);
+      Context ctx = PoiTransformer.createInitialContext();
+      Iterable<TransactionRecord> iterableRows = new Iterable<>() {
+        boolean consumed = false;
 
-    Context ctx = new Context();
-    Iterable<TransactionRecord> iterableRows = new Iterable<>() {
-      boolean consumed = false;
-
-      @Override
-      public Iterator<TransactionRecord> iterator() {
-        if (consumed) {
-          return Collections.emptyIterator();
+        @Override
+        public Iterator<TransactionRecord> iterator() {
+          if (consumed) {
+            return Collections.emptyIterator();
+          }
+          consumed = true;
+          return rows;
         }
-        consumed = true;
-        return rows;
-      }
-    };
-    ctx.putVar("rows", iterableRows);
+      };
+      ctx.putVar("rows", iterableRows);
 
-    JxlsHelper jh = JxlsHelper.getInstance()
-        .setUseFastFormulaProcessor(true);
+      JxlsHelper jh = JxlsHelper.getInstance()
+          .setUseFastFormulaProcessor(true);
 
-    jh.processTemplate(ctx, transformer);
+      jh.processTemplate(ctx, transformer);
 
-    Workbook wb = ((PoiTransformer) transformer).getWorkbook();
-    wb.setForceFormulaRecalculation(true);
+      Workbook wb = transformer.getWorkbook();
+      wb.setForceFormulaRecalculation(true);
+      transformer.write();
+    }
   }
 }
