@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Iterator;
 
 @Component
@@ -26,7 +27,19 @@ public class JxlsStreamingExporter {
     Transformer transformer = PoiTransformer.createSxssfTransformer(templateWorkbook, out, windowSize, true);
 
     Context ctx = new Context();
-    ctx.putVar("rows", rows);
+    Iterable<TransactionRecord> iterableRows = new Iterable<>() {
+      boolean consumed = false;
+
+      @Override
+      public Iterator<TransactionRecord> iterator() {
+        if (consumed) {
+          return Collections.emptyIterator();
+        }
+        consumed = true;
+        return rows;
+      }
+    };
+    ctx.putVar("rows", iterableRows);
 
     JxlsHelper jh = JxlsHelper.getInstance()
         .setUseFastFormulaProcessor(true);
