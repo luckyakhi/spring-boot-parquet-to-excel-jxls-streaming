@@ -59,16 +59,18 @@ class JxlsStreamingIntegrationTest {
   }
 
   private void writeSampleParquet(String file, int rows) throws Exception {
-    String schemaJson = "{"
-        + ""type":"record","
-        + ""name":"Txn","
-        + ""fields":["
-        + "  {"name":"accountId","type":"string"},"
-        + "  {"name":"currency","type":"string"},"
-        + "  {"name":"amount","type":"double"},"
-        + "  {"name":"txnDate","type":"string"}"
-        + "]"
-        + "}";
+    String schemaJson = """
+        {
+          "type": "record",
+          "name": "Txn",
+          "fields": [
+            {"name": "accountId", "type": "string"},
+            {"name": "currency", "type": "string"},
+            {"name": "amount", "type": "double"},
+            {"name": "txnDate", "type": "string"}
+          ]
+        }
+        """;
     Schema schema = new Schema.Parser().parse(schemaJson);
     try (ParquetWriter<GenericRecord> writer = AvroParquetWriter.<GenericRecord>builder(new org.apache.hadoop.fs.Path(file))
         .withSchema(schema)
