@@ -3,7 +3,6 @@ package com.example.jxlsstream.parquet;
 import com.example.jxlsstream.dto.TransactionRecord;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class ParquetService {
     if (!Files.exists(Paths.get(parquetFile))) {
       throw new IOException("Parquet file not found: " + parquetFile);
     }
-    Configuration conf = new Configuration();
+    var conf = HadoopConfigurationFactory.create();
     ParquetReader<GenericRecord> reader = AvroParquetReader.<GenericRecord>builder(new org.apache.hadoop.fs.Path(parquetFile))
         .withConf(conf)
         .build();
