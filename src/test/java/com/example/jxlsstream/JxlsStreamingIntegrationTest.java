@@ -18,10 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 @SpringBootTest
 class JxlsStreamingIntegrationTest {
@@ -55,7 +60,16 @@ class JxlsStreamingIntegrationTest {
     // 5) Assertions
     Assertions.assertTrue(Files.exists(xlsx));
     long size = Files.size(xlsx);
-    Assertions.assertTrue(size > 50_000, "XLSX size too small: " + size);
+    Assertions.assertTrue(size > 0, "XLSX appears to be empty");
+
+    try (InputStream in = Files.newInputStream(xlsx); Workbook workbook = WorkbookFactory.create(in)) {
+      Sheet sheet = workbook.getSheet("Transactions");
+      Assertions.assertNotNull(sheet, "Expected Transactions sheet");
+      Assertions.assertEquals("AccountId", sheet.getRow(0).getCell(0).getStringCellValue());
+      int physicalRows = sheet.getPhysicalNumberOfRows();
+      Assertions.assertTrue(physicalRows >= 50_001,
+          "Expected at least 50k data rows, but found only " + (physicalRows - 1));
+    }
   }
 
   private void writeSampleParquet(String file, int rows) throws Exception {
