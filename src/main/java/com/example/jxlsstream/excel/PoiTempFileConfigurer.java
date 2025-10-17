@@ -59,7 +59,7 @@ public class PoiTempFileConfigurer {
     }
 
     @Override
-    public File createDirectory(String prefix) throws IOException {
+    public File createTempDirectory(String prefix) throws IOException {
       Path dir = Files.createTempDirectory(baseDir, normalized(prefix));
       File directory = dir.toFile();
       directory.deleteOnExit();
