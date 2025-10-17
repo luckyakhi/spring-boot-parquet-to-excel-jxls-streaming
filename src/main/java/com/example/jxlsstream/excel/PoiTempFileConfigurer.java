@@ -1,16 +1,17 @@
 package com.example.jxlsstream.excel;
 
 import jakarta.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.poi.util.TempFile;
 import org.apache.poi.util.TempFileCreationStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 public class PoiTempFileConfigurer {
@@ -48,7 +49,6 @@ public class PoiTempFileConfigurer {
       return createTempFile(prefix, suffix, baseDir.toFile());
     }
 
-    @Override
     public File createTempFile(String prefix, String suffix, File directory) throws IOException {
       Path targetDir = directory == null ? baseDir : directory.toPath();
       Files.createDirectories(targetDir);
