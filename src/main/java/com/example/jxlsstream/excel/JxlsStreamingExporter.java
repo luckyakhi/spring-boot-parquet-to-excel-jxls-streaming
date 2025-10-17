@@ -6,6 +6,7 @@ import org.jxls.util.JxlsHelper;
 import org.jxls.transform.poi.PoiTransformer;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.io.FilterOutputStream;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 @Component
+@DependsOn("poiTempFileConfigurer")
 public class JxlsStreamingExporter {
 
   public void render(InputStream templateXlsx,
