@@ -50,20 +50,25 @@ public class PoiTempFileConfigurer {
     }
 
     public File createTempFile(String prefix, String suffix, File directory) throws IOException {
-      Path targetDir = directory == null ? baseDir : directory.toPath();
-      Files.createDirectories(targetDir);
-      Path tempFile = Files.createTempFile(targetDir, normalized(prefix), suffix);
-      File file = tempFile.toFile();
+      File targetDir = directory == null ? baseDir.toFile() : directory;
+      Files.createDirectories(targetDir.toPath());
+      File file =
+          File.createTempFile(normalized(prefix), suffix == null ? ".tmp" : suffix, targetDir);
       file.deleteOnExit();
       return file;
     }
 
     @Override
     public File createTempDirectory(String prefix) throws IOException {
-      Path dir = Files.createTempDirectory(baseDir, normalized(prefix));
-      File directory = dir.toFile();
-      directory.deleteOnExit();
-      return directory;
+      File targetDir = baseDir.toFile();
+      Files.createDirectories(targetDir.toPath());
+      File dir =
+          File.createTempFile(normalized(prefix), "", targetDir);
+      if (!dir.delete() || !dir.mkdir()) {
+        throw new IOException("Failed to create temporary directory under " + baseDir);
+      }
+      dir.deleteOnExit();
+      return dir;
     }
 
     private String normalized(String prefix) {
