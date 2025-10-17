@@ -8,6 +8,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
+import java.io.FilterOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -22,7 +24,8 @@ public class JxlsStreamingExporter {
                      int windowSize) throws Exception {
 
     try (Workbook templateWorkbook = new XSSFWorkbook(templateXlsx)) {
-      PoiTransformer transformer = PoiTransformer.createSxssfTransformer(templateWorkbook, out, windowSize, true);
+      OutputStream safeOut = new NonClosingOutputStream(out);
+      PoiTransformer transformer = PoiTransformer.createSxssfTransformer(templateWorkbook, safeOut, windowSize, true);
 
       Context ctx = PoiTransformer.createInitialContext();
       Iterable<TransactionRecord> iterableRows = new Iterable<>() {
@@ -47,6 +50,18 @@ public class JxlsStreamingExporter {
       Workbook wb = transformer.getWorkbook();
       wb.setForceFormulaRecalculation(true);
       transformer.write();
+      safeOut.flush();
+    }
+  }
+
+  private static class NonClosingOutputStream extends FilterOutputStream {
+    NonClosingOutputStream(OutputStream delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public void close() throws IOException {
+      flush();
     }
   }
 }
